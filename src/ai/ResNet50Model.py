@@ -13,7 +13,7 @@ class ResNet50Model(pl.LightningModule):
         self.lr = lr
         
         self.model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
-        
+        self.in_features2 = self.model.fc.in_features
         if freeze:
             for param in self.model.parameters():
                 param.requires_grad = False

@@ -14,8 +14,6 @@ def train_model(path):
     test_ds = Mushrooms_for_final(test)
     models_paths = '?'
     m = finalModel(model_paths=models_paths, num_classes=num_classes)
-    m.model
-
     num_folds = 4
     kf = StratifiedKFold(num_folds)
     lr = 3e-4
