@@ -10,7 +10,10 @@ from ai.transforms import train_augmentations, val_augmentations
 from ai.model import finalModel
 
 def train_model(path):
+    print("a")
+    print(get_final_dataset_from_path(path))
     train, test, num_classes = get_final_dataset_from_path(path)
+    print(train)
     test_ds = Mushrooms_for_final(test)
     models_paths = '?'
     m = finalModel(model_paths=models_paths, num_classes=num_classes)

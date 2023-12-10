@@ -85,12 +85,11 @@ def get_final_dataset_from_path(dataset_path):
     categories_paths =  list(ds_path.glob('*'))
     paths = [[sorted([xx for xx in list(id.glob('*'))]) for id in list(category.glob('*'))] for category in categories_paths]
 
-    xxs = [xx for xx in paths[:][:][0]]
+    #xxs = [xx for xx in paths[:][:][0]]
 
     xxs = []
     x1xs = []
     xx1s = []
-
     for i in range(len(paths)):
         for j in range(len(paths[i])):
             try:
@@ -101,12 +100,10 @@ def get_final_dataset_from_path(dataset_path):
                 print(paths[i][j])
 
     classes = [path.parent.parent.stem for path in xxs]
-
     Counter(classes), len(classes), len(set(classes))
     df = pd.DataFrame({'xxs': xxs, 'x1xs': x1xs, 'xx1s': xx1s, 'class': classes})
     df['class'] = df['class'].astype('category')
     df['label'] = df['class'].cat.codes
-
     train, test = train_test_split(df, test_size=0.1, shuffle=True, random_state=1357, stratify=df['label'])
     train = train.reset_index(drop=True)
     test = test.reset_index(drop=True)

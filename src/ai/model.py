@@ -16,21 +16,22 @@ class finalModel(pl.LightningModule):
         
         # Load models from files
         self.models = nn.ModuleList([ResNet50Model(num_classes=num_classes), ResNet50Model(num_classes=num_classes), ResNet50Model(num_classes=num_classes)])
-        features = []
+        self.features = []
         for model_path in range(3):
             #resnet_model = ResNet50Model(num_classes=num_classes)#torch.load(model_path)
-            features.append(self.models[model_path].in_features2)
+            self.features.append(self.models[model_path].in_features2)
             # Remove the last fully connected layer (fc) from each ResNet model
             self.models[model_path].model.fc = nn.Identity()
             #self.models.append(resnet_model)
         
-        # Linear layer for combined predictions
-        self.fc1= nn.Linear(3 * features[0], 256)
+        self.fc = nn.Sequential(
+            nn.Linear(3 * self.features[0], 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, self.num_classes)
+        )
 
-        self.fc2 = nn.Linear(256, 128),
-        self.fc3 = nn.Linear(128, self.num_classes)
-             # Assuming the fc layer in ResNet has 128 output features
-        
         self.loss_fn = nn.CrossEntropyLoss()
         
         self.train_acc = torchmetrics.Accuracy('multiclass', num_classes=self.num_classes)
@@ -43,14 +44,9 @@ class finalModel(pl.LightningModule):
         out1 = self.models[0](x1)
         out2 = self.models[1](x2)
         out3 = self.models[2](x3)
-        
         # Flatten and concatenate the outputs
-        out = torch.cat([out1.flatten(), out2.flatten(), out3.flatten()], dim=0)
-        
-        # Final linear layer for combined prediction
-        out = F.relu(self.fc1(out))
-        out = F.relu(self.fc2(out))
-        out = self.fc3(out)
+        out = torch.cat([out1.view(-1, self.features[0]), out2.view(-1, self.features[0]), out3.view(-1, self.features[0])], dim=-1)
+        out = self.fc(out)
         return out
     
     
