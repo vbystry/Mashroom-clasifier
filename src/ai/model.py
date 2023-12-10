@@ -23,6 +23,8 @@ class finalModel(pl.LightningModule):
             # Remove the last fully connected layer (fc) from each ResNet model
             self.models[model_path].model.fc = nn.Identity()
             #self.models.append(resnet_model)
+            for param in self.models[model_path].model.parameters():
+                param.requires_grad = False
         
         self.fc = nn.Sequential(
             nn.Linear(3 * self.features[0], 256),
