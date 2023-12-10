@@ -74,8 +74,7 @@ def get_dataset_from_path(dataset_path):
     train, test = train_test_split(df, test_size=0.1, shuffle=True, random_state=1357, stratify=df['label'])
     train = train.reset_index(drop=True)
     test = test.reset_index(drop=True)
-    
-    return train, test, len(classes)
+    return train, test, max(df['label'])+1
 
 def get_final_dataset_from_path(dataset_path):
     ds_path = Path(dataset_path).resolve()
@@ -108,4 +107,4 @@ def get_final_dataset_from_path(dataset_path):
     train = train.reset_index(drop=True)
     test = test.reset_index(drop=True)
     
-    return train, test, len(classes)
+    return train, test, max(df['label'])+1
