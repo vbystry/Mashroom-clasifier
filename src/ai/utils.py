@@ -45,21 +45,21 @@ class Mushrooms_for_final:
             self.augmentations = augmentations
         
     def __len__(self):
-        return len(self.paths)
+        return len(self.labels)
     
     def __getitem__(self, idx):
-        sample_xx = self.paths[idx]
+        sample_xx = self.xxs[idx]
         sample_xx = Image.open(sample_xx).convert(mode='RGB')
         sample_xx = self.augmentations(sample_xx)
-        sample_x1x = self.paths[idx]
+        sample_x1x = self.x1xs[idx]
         sample_x1x = Image.open(sample_x1x).convert(mode='RGB')
         sample_x1x = self.augmentations(sample_x1x)
-        sample_xx1 = self.paths[idx]
+        sample_xx1 = self.xx1s[idx]
         sample_xx1 = Image.open(sample_xx1).convert(mode='RGB')
         sample_xx1 = self.augmentations(sample_xx1)
         label = torch.tensor(self.labels[idx], dtype=torch.long)
         
-        return ((sample_xx, sample_x1x, sample_xx1), label)
+        return (sample_xx, sample_x1x, sample_xx1, label)
 
 def get_dataset_from_path(dataset_path):
     ds_path = Path(dataset_path).resolve()
@@ -93,9 +93,12 @@ def get_final_dataset_from_path(dataset_path):
 
     for i in range(len(paths)):
         for j in range(len(paths[i])):
-            xxs.append(paths[i][j][2])
-            x1xs.append(paths[i][j][0])
-            xx1s.append(paths[i][j][1])
+            try:
+                xxs.append(paths[i][j][2])
+                x1xs.append(paths[i][j][0])
+                xx1s.append(paths[i][j][1])
+            except:
+                print(paths[i][j])
 
     classes = [path.parent.parent.stem for path in xxs]
 

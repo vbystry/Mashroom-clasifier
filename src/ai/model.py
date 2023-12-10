@@ -4,24 +4,28 @@ import torchmetrics
 import torchvision.models as models
 import pytorch_lightning as pl
 import torch.nn.functional as F
+from ai.ResNet50Model import ResNet50Model
 
 
 class finalModel(pl.LightningModule):
     
-    def __init__(self, model_paths, num_classes=7, lr=3e-4):
+    def __init__(self, model_paths, num_classes=9, lr=3e-4):
+        super(finalModel, self).__init__()
         self.num_classes = num_classes
         self.lr = lr
         
         # Load models from files
-        self.models = nn.ModuleList()
-        for model_path in model_paths:
-            resnet_model = torch.load(model_path)
+        self.models = nn.ModuleList([ResNet50Model(num_classes=num_classes), ResNet50Model(num_classes=num_classes), ResNet50Model(num_classes=num_classes)])
+        features = []
+        for model_path in range(3):
+            #resnet_model = ResNet50Model(num_classes=num_classes)#torch.load(model_path)
+            features.append(self.models[model_path].in_features2)
             # Remove the last fully connected layer (fc) from each ResNet model
-            resnet_model.fc = nn.Identity()
-            self.models.append(resnet_model)
+            self.models[model_path].model.fc = nn.Identity()
+            #self.models.append(resnet_model)
         
         # Linear layer for combined predictions
-        self.fc1= nn.Linear(len(model_paths) * self.models[0].model.fc.in_features, 256)
+        self.fc1= nn.Linear(3 * features[0], 256)
 
         self.fc2 = nn.Linear(256, 128),
         self.fc3 = nn.Linear(128, self.num_classes)
