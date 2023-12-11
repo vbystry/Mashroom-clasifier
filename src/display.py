@@ -27,8 +27,8 @@ if __name__ == "__main__":
 
     val_augmentations = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],  # ImageNet Mean
-                             std=[0.229, 0.224, 0.225]  # ImageNet Std
+        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                             std=[0.229, 0.224, 0.225]
                              ),
         transforms.Resize((180, 180), antialias=True),
     ])
