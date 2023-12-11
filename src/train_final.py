@@ -16,7 +16,7 @@ def train_model(path):
     print(train)
     test_ds = Mushrooms_for_final(test)
     models_paths = '?'
-    m = finalModel(model_paths=models_paths, num_classes=num_classes)
+    m = finalModel(num_classes=num_classes)
     num_folds = 4
     kf = StratifiedKFold(num_folds)
     lr = 3e-4
@@ -37,7 +37,7 @@ def train_model(path):
         val_dataloader = torch.utils.data.DataLoader(val_ds, batch_size=64, num_workers=8)
         test_dataloader = torch.utils.data.DataLoader(test_ds, batch_size=128, num_workers=8)
 
-        model = finalModel(model_paths=models_paths, num_classes=num_classes)
+        model = finalModel(num_classes=num_classes)
         trainer = pl.Trainer(accelerator='gpu',
                              max_epochs=10,
                              callbacks=[
@@ -55,6 +55,8 @@ def train_model(path):
         trainer.fit(model, train_dataloader, val_dataloader)
         metrics = trainer.logged_metrics
         trainer.test(model, test_dataloader)
+
+        torch.save(model, "./trained_models/final_model" + str(fold))
 
         logs[f'fold{fold}'] = {
             'train_loss': metrics['train_loss_epoch'].item(),

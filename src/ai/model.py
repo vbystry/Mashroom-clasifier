@@ -9,23 +9,27 @@ from ai.ResNet50Model import ResNet50Model
 
 class finalModel(pl.LightningModule):
     
-    def __init__(self, model_paths, num_classes=9, lr=3e-4):
+    def __init__(self, num_classes=9, lr=3e-4):
         super(finalModel, self).__init__()
         self.num_classes = num_classes
         self.lr = lr
         
-        # Load models from files
-        self.models = nn.ModuleList([ResNet50Model(num_classes=num_classes), ResNet50Model(num_classes=num_classes), ResNet50Model(num_classes=num_classes)])
+                # Load models from files
+        trained_paths = [r"lightning_logs\cap\checkpoints\epoch=9-step=540.ckpt",
+                         r"lightning_logs\under\checkpoints\epoch=5-step=54.ckpt",
+                         r"lightning_logs\leg\checkpoints\epoch=5-step=174.ckpt"]
+        helpers = []
+        m = ResNet50Model(num_classes=11)
         self.features = []
-        for model_path in range(3):
-            #resnet_model = ResNet50Model(num_classes=num_classes)#torch.load(model_path)
-            self.features.append(self.models[model_path].in_features2)
-            # Remove the last fully connected layer (fc) from each ResNet model
-            self.models[model_path].model.fc = nn.Identity()
-            #self.models.append(resnet_model)
-            for param in self.models[model_path].model.parameters():
-                param.requires_grad = False
-        
+        for item in trained_paths:
+            helpers.append(ResNet50Model.load_from_checkpoint(item, num_classes=11))
+            self.features.append(m.in_features2)
+        for h in helpers:
+            h.freeze()
+        self.models = nn.ModuleList(helpers)
+
+        for i in range(len(self.models)):
+            self.models[i].model.fc = nn.Identity()
         self.fc = nn.Sequential(
             nn.Linear(3 * self.features[0], 256),
             nn.ReLU(),
