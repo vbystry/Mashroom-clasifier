@@ -9,20 +9,20 @@ from ai.ResNet50Model import ResNet50Model
 
 class finalModel(pl.LightningModule):
     
-    def __init__(self, num_classes=9, lr=3e-4):
+    def __init__(self, num_classes=23, lr=3e-4):
         super(finalModel, self).__init__()
         self.num_classes = num_classes
         self.lr = lr
         
                 # Load models from files
-        trained_paths = [r"lightning_logs\cap\checkpoints\epoch=9-step=540.ckpt",
-                         r"lightning_logs\under\checkpoints\epoch=5-step=54.ckpt",
-                         r"lightning_logs\leg\checkpoints\epoch=5-step=174.ckpt"]
+        trained_paths = [r"trained_models\epoch=5-step=330.ckpt",
+                         r"trained_models\epoch=5-step=192.ckpt",
+                         r"trained_models\epoch=5-step=54.ckpt"]
         helpers = []
         m = ResNet50Model(num_classes=11)
         self.features = []
         for item in trained_paths:
-            helpers.append(ResNet50Model.load_from_checkpoint(item, num_classes=11))
+            helpers.append(ResNet50Model.load_from_checkpoint(item, num_classes=23))
             self.features.append(m.in_features2)
         for h in helpers:
             h.freeze()
@@ -53,7 +53,7 @@ class finalModel(pl.LightningModule):
         # Flatten and concatenate the outputs
         out = torch.cat([out1.view(-1, self.features[0]), out2.view(-1, self.features[0]), out3.view(-1, self.features[0])], dim=-1)
         out = self.fc(out)
-        return out
+        return out, out1, out2, out3
     
     
     def configure_optimizers(self):
